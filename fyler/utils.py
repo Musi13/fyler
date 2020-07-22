@@ -1,4 +1,6 @@
 import re
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QListWidgetItem
 
 def longest_common_prefix(*strings):
     end = 0
@@ -15,6 +17,16 @@ def guess_title(*titles):
     result = result.replace('_', ' ')
     return result
 
-def listwidget_items(listwidget):
+def listwidget_item(text, data):
+    item = QListWidgetItem()
+    item.setText(text)
+    item.setData(Qt.UserRole, data)
+    return item
+
+def listwidget_text_items(listwidget):
     for i in range(listwidget.count()):
         yield listwidget.item(i).text()
+
+def listwidget_data_items(listwidget):
+    for i in range(listwidget.count()):
+        yield listwidget.item(i).data(Qt.UserRole)

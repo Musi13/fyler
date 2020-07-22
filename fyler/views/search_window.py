@@ -26,7 +26,7 @@ class SearchWindow(SearchWindowUI, SearchWindowBase):
     def accept_result(self):
         # TODO, do another query for the result to populate the
         # rest of the metadata, the results can be medias that aren't fleshed out
-        self.result = self.resultList.currentItem().text()
+        self.result = self.resultList.currentItem().data(Qt.UserRole)
         self.accept()
 
     def do_search(self):
@@ -38,4 +38,5 @@ class SearchWindow(SearchWindowUI, SearchWindowBase):
         results = anilist.AniListProvider().search(self.searchBox.text())
 
         for item in results:
-            self.resultList.addItem(item.title)
+            qtitem = utils.listwidget_item(item.title, item)
+            self.resultList.addItem(qtitem)

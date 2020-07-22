@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 
 from fyler import utils
 from fyler.providers import anilist
-from fyler.utils import listwidget_items
+from fyler.utils import listwidget_text_items, listwidget_item
 from fyler.views.search_window import SearchWindow
 
 uifile = (Path(__file__) / '../../assets/ui/mainwindow.ui').resolve()
@@ -64,9 +64,12 @@ class MainWindow(MainWindowUI, MainWindowBase):
                 if os.path.isdir(item):
                     for subdir, dirs, files in os.walk(item):
                         for filename in files:
-                            self.sourceList.addItem(os.path.join(subdir, filename))
+                            filepath = os.path.join(subdir, filename)
+                            qtitem = listwidget_item(filename, filepath)
+                            self.sourceList.addItem(qtitem)
                 else:
-                    self.sourceList.addItem(item)
+                    qtitem = listwidget_item(os.path.basename(item), item)
+                    self.sourceList.addItem(qtitem)
 
         t = 'directory' if directory else 'files'
         msg = self.tr(f"Choose {t} to rename")
@@ -74,7 +77,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
         dialog.open(receive)
 
     def match_sources(self):
-        guess = utils.guess_title(*listwidget_items(self.sourceList))
+        guess = utils.guess_title(*listwidget_text_items(self.sourceList))
         print(f'Guessing {guess}')
         # dialog = search_dialog(self, guess)
         # dialog.open(receive)
@@ -84,10 +87,10 @@ class MainWindow(MainWindowUI, MainWindowBase):
         window.show()
         if window.exec_():
             self.destList.clear()
-            for i, name in enumerate(listwidget_items(self.sourceList)):
-                self.destList.addItem(f'{window.result} - {i+1}')
+            for i, name in enumerate(listwidget_text_items(self.sourceList)):
+                self.destList.addItem(f'{window.result.title} - {i+1}')
 
     def process_action(self):
-        for source, dest in zip(listwidget_items(self.sourceList), listwidget_items(self.destList)):
+        for source, dest in zip(listwidget_text_items(self.sourceList), listwidget_text_items(self.destList)):
             print(f'os.symlink({source}, {dest})')
 
