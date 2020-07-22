@@ -1,0 +1,92 @@
+import os
+from pathlib import Path
+from PyQt5 import uic, QtCore
+from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
+from PyQt5.QtCore import Qt
+
+from fyler import utils
+
+uifile = (Path(__file__) / '../../assets/ui/mainwindow.ui').resolve()
+MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
+
+def choose_sources_dialog(parent, title, directory=True):
+    options = QFileDialog.Options()
+    if directory:
+        options |= QFileDialog.ShowDirsOnly
+    dialog = QFileDialog(parent, title, os.path.expanduser('~'), options=options)
+    dialog.setFileMode(QFileDialog.Directory if directory else QFileDialog.ExistingFiles)
+    dialog.setParent(parent, QtCore.Qt.Sheet)
+    return dialog
+
+def search_dialog(parent, default=''):
+    dialog = QInputDialog(parent)
+    dialog.setWindowTitle('Search')
+    dialog.setInputMode(QInputDialog.TextInput)
+    dialog.setTextValue(default)
+    dialog.setOkButtonText('Search')
+    dialog.setParent(parent, QtCore.Qt.Sheet)
+    return dialog
+
+def listwidget_items(listwidget):
+    for i in range(listwidget.count()):
+        yield listwidget.item(i).text()
+
+class MainWindow(MainWindowUI, MainWindowBase):
+
+
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__()
+        self.setupUi(self)
+
+        self.folderButton.clicked.connect(lambda: self.add_sources(directory=True))
+        self.filesButton.clicked.connect(lambda: self.add_sources(directory=False))
+
+        self.matchButton.clicked.connect(self.match_sources)
+        self.actionButton.clicked.connect(self.process_action)
+
+        # self.setWindowTitle("Fyler")
+
+        # label = QLabel("This is a PyQt5 window!")
+
+        # # The `Qt` namespace has a lot of attributes to customise
+        # # widgets. See: http://doc.qt.io/qt-5/qt.html
+        # label.setAlignment(Qt.AlignCenter)
+
+        # # Set the central widget of the Window. Widget will expand
+        # # to take up all the space in the window by default.
+        # self.setCentralWidget(label)
+
+    def add_sources(self, directory):
+        def receive():
+            self.sourceList.clear()
+            self.destList.clear()
+            sources = dialog.selectedFiles()
+            for item in sources:
+                if os.path.isdir(item):
+                    for subdir, dirs, files in os.walk(item):
+                        for filename in files:
+                            self.sourceList.addItem(os.path.join(subdir, filename))
+                else:
+                    self.sourceList.addItem(item)
+
+        t = 'directory' if directory else 'files'
+        msg = self.tr(f"Choose {t} to rename")
+        dialog = choose_sources_dialog(self, msg, directory=directory)
+        dialog.open(receive)
+
+    def match_sources(self):
+        def receive():
+            self.destList.clear()
+            # TODO: Call to api and get results, then pair with sources
+            for item in listwidget_items(self.sourceList):
+                self.destList.addItem(item)
+
+        guess = utils.guess_title(*listwidget_items(self.sourceList))
+        print(f'Guessing {guess}')
+        dialog = search_dialog(self, guess)
+        dialog.open(receive)
+
+    def process_action(self):
+        for source, dest in zip(listwidget_items(self.sourceList), listwidget_items(self.destList)):
+            print(f'os.symlink({source}, {dest})')
+

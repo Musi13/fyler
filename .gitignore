@@ -1,0 +1,9 @@
+*.deb
+*.egg-info
+*.whl
+venv/
+*.gz
+*.mkv
+__pycache__
+*.pyc
+*.egg-info
