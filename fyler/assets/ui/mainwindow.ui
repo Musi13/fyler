@@ -40,18 +40,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QListWidget" name="sourceList">
-       <item>
-        <property name="text">
-         <string>Example 1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Example 2</string>
-        </property>
-       </item>
-      </widget>
+      <widget class="QListWidget" name="sourceList"/>
      </item>
      <item row="2" column="0">
       <layout class="QGridLayout" name="leftGrid">

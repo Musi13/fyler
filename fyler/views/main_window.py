@@ -5,6 +5,9 @@ from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
 from PyQt5.QtCore import Qt
 
 from fyler import utils
+from fyler.providers import anilist
+from fyler.utils import listwidget_items
+from fyler.views.search_window import SearchWindow
 
 uifile = (Path(__file__) / '../../assets/ui/mainwindow.ui').resolve()
 MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
@@ -26,10 +29,6 @@ def search_dialog(parent, default=''):
     dialog.setOkButtonText('Search')
     dialog.setParent(parent, QtCore.Qt.Sheet)
     return dialog
-
-def listwidget_items(listwidget):
-    for i in range(listwidget.count()):
-        yield listwidget.item(i).text()
 
 class MainWindow(MainWindowUI, MainWindowBase):
 
@@ -75,16 +74,18 @@ class MainWindow(MainWindowUI, MainWindowBase):
         dialog.open(receive)
 
     def match_sources(self):
-        def receive():
-            self.destList.clear()
-            # TODO: Call to api and get results, then pair with sources
-            for item in listwidget_items(self.sourceList):
-                self.destList.addItem(item)
-
         guess = utils.guess_title(*listwidget_items(self.sourceList))
         print(f'Guessing {guess}')
-        dialog = search_dialog(self, guess)
-        dialog.open(receive)
+        # dialog = search_dialog(self, guess)
+        # dialog.open(receive)
+
+        window = SearchWindow(guess)
+        window.setParent(self, QtCore.Qt.Sheet)
+        window.show()
+        if window.exec_():
+            self.destList.clear()
+            for i, name in enumerate(listwidget_items(self.sourceList)):
+                self.destList.addItem(f'{window.result} - {i+1}')
 
     def process_action(self):
         for source, dest in zip(listwidget_items(self.sourceList), listwidget_items(self.destList)):

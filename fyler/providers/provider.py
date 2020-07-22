@@ -29,5 +29,5 @@ class Movie(Media):
 
 
 class Provider:
-    def search(query: str) -> Media:
+    def search(self, query: str) -> list:
         raise NotImplementedError()

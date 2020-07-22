@@ -101,5 +101,5 @@ class AniDBProvider(provider.Provider):
                 next(reader)  # Header
             return int(max(reader, key=key)[0])
 
-    def search(self, query: str) -> provider.Media:
-        return self.get_info(self._search_for_id(query))
+    def search(self, query: str) -> list:
+        return [self.get_info(self._search_for_id(query))]

@@ -14,3 +14,7 @@ def guess_title(*titles):
     result = re.fullmatch(r'[^a-zA-Z0-9]*(.*?)[^a-zA-Z0-9]*', result).group(1) # Strip non-word characters
     result = result.replace('_', ' ')
     return result
+
+def listwidget_items(listwidget):
+    for i in range(listwidget.count()):
+        yield listwidget.item(i).text()
