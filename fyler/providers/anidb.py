@@ -17,7 +17,7 @@ _cache_dir = Path.home() / '.cache/fyler'
 _cache_dir.mkdir(parents=True, exist_ok=True)
 cache = Cache(directory=str(_cache_dir))
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 
 @sleep_and_retry
@@ -40,8 +40,8 @@ def _raw_get_info(id: int) -> str:
 
 
 class AniDBProvider(provider.Provider):
-    def __init__(self):
-        pass
+    def detail(self, series):
+        return series
 
     def get_info(self, id: int) -> provider.Media:
         xml = _raw_get_info(id)

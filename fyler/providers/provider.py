@@ -1,3 +1,4 @@
+import dataclasses
 from dataclasses import dataclass
 
 
@@ -9,6 +10,14 @@ class Media:
     id: int
     overview: str
     rating: float
+
+    # I wish dataclasses had this interface naturally,
+    # it's a bit more convenient imo.
+    def asdict(self):
+        return dataclasses.asdict(self)
+
+    def astuple(self):
+        return dataclasses.astuple(self)
 
 
 @dataclass

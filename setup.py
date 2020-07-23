@@ -13,16 +13,23 @@ VERSION = '0+unknown'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
+    # CLI
     'click',
+
+    # UI
+    'PyQT5',
+
+    # AniDB
     'textdistance[extras]',
-    'requests',
     'ratelimit',
     'diskcache',
     'beautifulsoup4',
     'lxml',
-    'pymediainfo',
-    'PyQT5',
-    'appdirs'
+
+    # General
+    'requests',
+    'appdirs',
+    'pluggy',
 ]
 
 
@@ -34,10 +41,13 @@ setup(
     long_description=DESCRIPTION,
     author=AUTHOR,
     python_requires=REQUIRES_PYTHON,
-    packages=find_packages(exclude=['tests']),
-
-    # entry_points={
-    #     'console_scripts': ['mycli=mymodule:cli'],
-    # },
+    packages=['fyler', 'fyler.providers'],
+    entry_points={
+        'console_scripts': ['fyler=fyler.__main__:main'],
+        'fyler.providers': [
+            'anidb = fyler.providers.anidb:AniDBProvider',
+            'anilist = fyler.providers.anilist:AniListProvider',
+        ]
+    },
     install_requires=REQUIRED
 )

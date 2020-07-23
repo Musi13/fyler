@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
 from PyQt5.QtCore import Qt
 
 from fyler import utils, settings, settings_handler
-from fyler.providers import anilist
 
 uifile = (Path(__file__) / '../../assets/ui/settingswindow.ui').resolve()
 SettingsWindowUI, SettingsWindowBase = uic.loadUiType(uifile)
@@ -21,11 +20,13 @@ class SettingsWindow(SettingsWindowUI, SettingsWindowBase):
     def load_settings(self):
         self.providerEdit.setText(settings['provider'])
         self.actionEdit.setText(settings['modify_action'])
+        self.formatEdit.setText(settings['output_format'])
 
     def save_settings(self):
         newsettings = {
             'provider': self.providerEdit.text(),
             'modify_action': self.actionEdit.text(),
+            'output_format': self.formatEdit.text(),
         }
         settings.update(newsettings)
         settings_handler.save_settings()

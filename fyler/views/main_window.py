@@ -4,8 +4,7 @@ from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
 from PyQt5.QtCore import Qt
 
-from fyler import utils
-from fyler.providers import anilist
+from fyler import utils, settings
 from fyler.utils import listwidget_text_items, listwidget_item
 from fyler.views.search_window import SearchWindow
 from fyler.views.settings_window import SettingsWindow
@@ -32,6 +31,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
 
         self.matchButton.clicked.connect(self.match_sources)
         self.actionButton.clicked.connect(self.process_action)
+        self.actionButton.setText(settings['modify_action'].title())
 
         self.settingsButton.clicked.connect(self.edit_settings)
 
@@ -57,25 +57,34 @@ class MainWindow(MainWindowUI, MainWindowBase):
         dialog.open(receive)
 
     def match_sources(self):
-        guess = utils.guess_title(*listwidget_text_items(self.sourceList))
-        print(f'Guessing {guess}')
-        # dialog = search_dialog(self, guess)
-        # dialog.open(receive)
+        if self.sourceList.count() <= 0:
+            return
 
+        guess = utils.guess_title(*listwidget_text_items(self.sourceList))
         window = SearchWindow(guess)
         window.setParent(self, Qt.Sheet)
         window.show()
         if window.exec_():
             self.destList.clear()
-            for i, name in enumerate(listwidget_text_items(self.sourceList)):
-                self.destList.addItem(f'{window.result.title} - {i+1}')
+            for episode in window.result.episodes:
+                env = window.result.asdict()
+                env['episode_number'] = episode.asdict()['episode_number']
+                env['season_number'] = episode.asdict()['season_number']
+                self.destList.addItem(settings['output_format'].format(**env))
 
     def process_action(self):
+        actions = {
+            'symlink': os.symlink,
+            'rename': os.rename,
+        }
         for source, dest in zip(listwidget_text_items(self.sourceList), listwidget_text_items(self.destList)):
-            print(f'os.symlink({source}, {dest})')
+            action = settings['modify_action']  # TODO: actions[settings['modify_action']]
+            print(f'{action}({source}, {dest})')
 
     def edit_settings(self):
         window = SettingsWindow()
         window.setParent(self, Qt.Sheet)
         window.show()
         window.exec_()
+        self.actionButton.setText(settings['modify_action'].title())
+        # TODO: Re-evaluate all destList items with output_format
