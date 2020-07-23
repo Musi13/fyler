@@ -13,21 +13,15 @@
   <property name="windowTitle">
    <string>Fyler</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QGridLayout" name="mainGrid">
-     <property name="topMargin">
-      <number>20</number>
-     </property>
+    <layout class="QGridLayout" name="topGrid">
      <item row="0" column="1">
       <widget class="QLabel" name="destTitle">
        <property name="text">
         <string>New Path</string>
        </property>
       </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QListWidget" name="destList"/>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="sourceTitle">
@@ -42,41 +36,47 @@
      <item row="1" column="0">
       <widget class="QListWidget" name="sourceList"/>
      </item>
+     <item row="1" column="1">
+      <widget class="QListWidget" name="destList"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="bottomGrid">
+     <item row="3" column="0">
+      <widget class="QPushButton" name="filesButton">
+       <property name="text">
+        <string>Add Files</string>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="0">
-      <layout class="QGridLayout" name="leftGrid">
-       <item row="0" column="0">
-        <widget class="QPushButton" name="folderButton">
-         <property name="text">
-          <string>Add Folder</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QPushButton" name="filesButton">
-         <property name="text">
-          <string>Add Files</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QPushButton" name="folderButton">
+       <property name="text">
+        <string>Add Folder</string>
+       </property>
+      </widget>
      </item>
      <item row="2" column="1">
-      <layout class="QGridLayout" name="rightGrid">
-       <item row="0" column="0">
-        <widget class="QPushButton" name="matchButton">
-         <property name="text">
-          <string>Match</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QPushButton" name="actionButton">
-         <property name="text">
-          <string>Symlink</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QPushButton" name="matchButton">
+       <property name="text">
+        <string>Match</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QPushButton" name="actionButton">
+       <property name="text">
+        <string>Symlink</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="settingsButton">
+       <property name="text">
+        <string>Settings</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

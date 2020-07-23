@@ -22,6 +22,7 @@ REQUIRED = [
     'lxml',
     'pymediainfo',
     'PyQT5',
+    'appdirs'
 ]
 
 

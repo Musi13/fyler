@@ -12,7 +12,7 @@ SearchWindowUI, SearchWindowBase = uic.loadUiType(uifile)
 
 class SearchWindow(SearchWindowUI, SearchWindowBase):
     def __init__(self, initial_query=None):
-        super(SearchWindow, self).__init__()
+        super().__init__()
         self.setupUi(self)
         self.result = None
 

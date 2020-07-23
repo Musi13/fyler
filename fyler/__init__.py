@@ -1,2 +1,1 @@
-def process(file, format, action, *, db='AniDB', query=None):
-    pass
+from .settings_handler import settings  # For fyler.settings

@@ -8,6 +8,7 @@ from fyler import utils
 from fyler.providers import anilist
 from fyler.utils import listwidget_text_items, listwidget_item
 from fyler.views.search_window import SearchWindow
+from fyler.views.settings_window import SettingsWindow
 
 uifile = (Path(__file__) / '../../assets/ui/mainwindow.ui').resolve()
 MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
@@ -21,20 +22,9 @@ def choose_sources_dialog(parent, title, directory=True):
     dialog.setParent(parent, QtCore.Qt.Sheet)
     return dialog
 
-def search_dialog(parent, default=''):
-    dialog = QInputDialog(parent)
-    dialog.setWindowTitle('Search')
-    dialog.setInputMode(QInputDialog.TextInput)
-    dialog.setTextValue(default)
-    dialog.setOkButtonText('Search')
-    dialog.setParent(parent, QtCore.Qt.Sheet)
-    return dialog
-
 class MainWindow(MainWindowUI, MainWindowBase):
-
-
     def __init__(self, parent=None):
-        super(MainWindow, self).__init__()
+        super().__init__()
         self.setupUi(self)
 
         self.folderButton.clicked.connect(lambda: self.add_sources(directory=True))
@@ -43,17 +33,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
         self.matchButton.clicked.connect(self.match_sources)
         self.actionButton.clicked.connect(self.process_action)
 
-        # self.setWindowTitle("Fyler")
-
-        # label = QLabel("This is a PyQt5 window!")
-
-        # # The `Qt` namespace has a lot of attributes to customise
-        # # widgets. See: http://doc.qt.io/qt-5/qt.html
-        # label.setAlignment(Qt.AlignCenter)
-
-        # # Set the central widget of the Window. Widget will expand
-        # # to take up all the space in the window by default.
-        # self.setCentralWidget(label)
+        self.settingsButton.clicked.connect(self.edit_settings)
 
     def add_sources(self, directory):
         def receive():
@@ -83,7 +63,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
         # dialog.open(receive)
 
         window = SearchWindow(guess)
-        window.setParent(self, QtCore.Qt.Sheet)
+        window.setParent(self, Qt.Sheet)
         window.show()
         if window.exec_():
             self.destList.clear()
@@ -94,3 +74,8 @@ class MainWindow(MainWindowUI, MainWindowBase):
         for source, dest in zip(listwidget_text_items(self.sourceList), listwidget_text_items(self.destList)):
             print(f'os.symlink({source}, {dest})')
 
+    def edit_settings(self):
+        window = SettingsWindow()
+        window.setParent(self, Qt.Sheet)
+        window.show()
+        window.exec_()
