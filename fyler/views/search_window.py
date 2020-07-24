@@ -26,6 +26,7 @@ class SearchWindow(SearchWindowUI, SearchWindowBase):
         # TODO, do another query (detail()) for the result to populate the
         # rest of the metadata, the results can be medias that aren't fleshed out
         self.result = self.resultList.currentItem().data(Qt.UserRole)
+        self.result = settings.provider().detail(self.result)
         self.accept()
 
     def do_search(self):

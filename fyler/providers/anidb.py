@@ -8,6 +8,7 @@ from ratelimit import limits, sleep_and_retry
 from diskcache import Cache
 import bs4
 from bs4 import BeautifulSoup
+import heapq
 
 from . import provider
 
@@ -41,7 +42,7 @@ def _raw_get_info(id: int) -> str:
 
 class AniDBProvider(provider.Provider):
     def detail(self, series):
-        return series
+        return self.get_info(series.id)
 
     def get_info(self, id: int) -> provider.Media:
         xml = _raw_get_info(id)
@@ -72,7 +73,7 @@ class AniDBProvider(provider.Provider):
                     'id': int(episode.attrs['id']),
                     'season_number': None,
                     'episode_number': int(episode.find('epno').text),  # I want this to be an int, but sometimes its different (specials?)
-                    'overview': episode.find('summary').text,
+                    'overview': episode.find('summary').text if episode.find('summary') else None,
                     'rating': float(episode.find('rating').text),
                 }
                 for title in episode.find_all('title'):
@@ -89,17 +90,29 @@ class AniDBProvider(provider.Provider):
         else:
             raise ValueError('Anime is not a TV Series or Movie')
 
-    def _search_for_id(self, query: str) -> int:
+    def _search_by_name(self, query: str) -> int:
         """
         Searches for the closest match to query. Note that this function
         loads the dat file every time, and is not recommended for multiple searches.
         """
         key = lambda x: textdistance.levenshtein.normalized_similarity(query, x[3])
         with open(_titles_dat, newline='') as f:
+            # Filter by primary title
             reader = csv.reader(f, delimiter='|')
             for _ in range(3):
                 next(reader)  # Header
-            return int(max(reader, key=key)[0])
+            reader = filter(lambda k: int(k[1]) == 1, reader)
+            return heapq.nlargest(10, reader, key=key)
 
     def search(self, query: str) -> list:
-        return [self.get_info(self._search_for_id(query))]
+        return [
+            provider.Series(
+                database='AniDB',
+                title=k[3],
+                id=int(k[0]),
+                overview=None,
+                rating=None,
+                episodes=[],
+            )
+            for k in self._search_by_name(query)
+        ]

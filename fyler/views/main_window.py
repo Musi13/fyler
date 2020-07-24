@@ -5,12 +5,13 @@ from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
 from PyQt5.QtCore import Qt
 
 from fyler import utils, settings
-from fyler.utils import listwidget_text_items, listwidget_item
+from fyler.utils import listwidget_text_items, listwidget_data_items, listwidget_item
 from fyler.views.search_window import SearchWindow
 from fyler.views.settings_window import SettingsWindow
 
 uifile = (Path(__file__) / '../../assets/ui/mainwindow.ui').resolve()
 MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
+
 
 def choose_sources_dialog(parent, title, directory=True):
     options = QFileDialog.Options()
@@ -21,11 +22,14 @@ def choose_sources_dialog(parent, title, directory=True):
     dialog.setParent(parent, QtCore.Qt.Sheet)
     return dialog
 
+
 class MainWindow(MainWindowUI, MainWindowBase):
     def __init__(self, parent=None):
         super().__init__()
         self.setupUi(self)
 
+        # TODO: Add buttons/hotkeys for reassigning matches
+        # TODO: Scroll the two lists together
         self.folderButton.clicked.connect(lambda: self.add_sources(directory=True))
         self.filesButton.clicked.connect(lambda: self.add_sources(directory=False))
 
@@ -44,11 +48,12 @@ class MainWindow(MainWindowUI, MainWindowBase):
                 if os.path.isdir(item):
                     for subdir, dirs, files in os.walk(item):
                         for filename in files:
-                            filepath = os.path.join(subdir, filename)
+                            filepath = os.path.abspath(os.path.join(subdir, filename))
                             qtitem = listwidget_item(filename, filepath)
                             self.sourceList.addItem(qtitem)
                 else:
-                    qtitem = listwidget_item(os.path.basename(item), item)
+                    filepath = os.path.abspath(item)
+                    qtitem = listwidget_item(os.path.basename(filepath), filepath)
                     self.sourceList.addItem(qtitem)
 
         t = 'directory' if directory else 'files'
@@ -68,8 +73,17 @@ class MainWindow(MainWindowUI, MainWindowBase):
             self.destList.clear()
             for episode in window.result.episodes:
                 env = window.result.asdict()
-                env['episode_number'] = episode.asdict()['episode_number']
-                env['season_number'] = episode.asdict()['season_number']
+                # TODO: These formats are failing because of invalid types (sometimes things are None),
+                # it would be nice if those cases resulted in a * or something
+                env.update({
+                    'n': window.result.title,
+                    's': episode.season_number,
+                    'e': episode.episode_number,
+                    'sxe': f'{episode.season_number}x{episode.episode_number:02}',
+                    's00e00': f'S{episode.season_number:02}E{episode.episode_number:02}' if episode.season_number and episode.episode_number else '*',
+                    't': episode.title,
+                    'id': episode.id,
+                })
                 self.destList.addItem(settings['output_format'].format(**env))
 
     def process_action(self):
@@ -77,9 +91,10 @@ class MainWindow(MainWindowUI, MainWindowBase):
             'symlink': os.symlink,
             'rename': os.rename,
         }
-        for source, dest in zip(listwidget_text_items(self.sourceList), listwidget_text_items(self.destList)):
+        for source, dest in zip(listwidget_data_items(self.sourceList), listwidget_text_items(self.destList)):
             action = settings['modify_action']  # TODO: actions[settings['modify_action']]
-            print(f'{action}({source}, {dest})')
+            extension = os.path.splitext(source)[1]
+            print(f'{action}({source}, {dest}{extension})')
 
     def edit_settings(self):
         window = SettingsWindow()
