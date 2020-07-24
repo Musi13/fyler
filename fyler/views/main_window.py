@@ -4,7 +4,7 @@ from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
 from PyQt5.QtCore import Qt
 
-from fyler import utils, settings
+from fyler import utils, settings, settings_handler
 from fyler.utils import listwidget_text_items, listwidget_data_items, listwidget_item
 from fyler.views.search_window import SearchWindow
 from fyler.views.settings_window import SettingsWindow
@@ -36,6 +36,16 @@ class MainWindow(MainWindowUI, MainWindowBase):
         self.matchButton.clicked.connect(self.match_sources)
         self.actionButton.clicked.connect(self.process_action)
         self.actionButton.setText(settings['modify_action'].title())
+
+        self.sourceUpButton.clicked.connect(lambda: self.move_item(self.sourceList, 'up'))
+        self.sourceDownButton.clicked.connect(lambda: self.move_item(self.sourceList, 'down'))
+        self.destUpButton.clicked.connect(lambda: self.move_item(self.destList, 'up'))
+        self.destDownButton.clicked.connect(lambda: self.move_item(self.destList, 'down'))
+
+        self.sourceXButton.clicked.connect(lambda: self.remove_item(self.sourceList))
+        self.destXButton.clicked.connect(lambda: self.remove_item(self.destList))
+
+
 
         self.settingsButton.clicked.connect(self.edit_settings)
 
@@ -81,18 +91,16 @@ class MainWindow(MainWindowUI, MainWindowBase):
                     'e': episode.episode_number,
                     'sxe': f'{episode.season_number}x{episode.episode_number:02}',
                     's00e00': f'S{episode.season_number:02}E{episode.episode_number:02}' if episode.season_number and episode.episode_number else '*',
+                    'e00': f'{episode.episode_number:02}',
                     't': episode.title,
                     'id': episode.id,
                 })
-                self.destList.addItem(settings['output_format'].format(**env))
+                dest = settings['output_format'].format(**env).replace('/', '&')
+                self.destList.addItem(dest)
 
     def process_action(self):
-        actions = {
-            'symlink': os.symlink,
-            'rename': os.rename,
-        }
         for source, dest in zip(listwidget_data_items(self.sourceList), listwidget_text_items(self.destList)):
-            action = settings['modify_action']  # TODO: actions[settings['modify_action']]
+            action = settings['modify_action']  # TODO: settings.action()
             extension = os.path.splitext(source)[1]
             print(f'{action}({source}, {dest}{extension})')
 
@@ -101,5 +109,21 @@ class MainWindow(MainWindowUI, MainWindowBase):
         window.setParent(self, Qt.Sheet)
         window.show()
         window.exec_()
-        self.actionButton.setText(settings['modify_action'].title())
+        self.actionButton.setText(settings_handler.action_names[settings['modify_action']])
         # TODO: Re-evaluate all destList items with output_format
+
+    def move_item(self, item_list, direction):
+        crow = item_list.currentRow()
+        if crow < 0:
+            return  # Not selected
+
+        nrow = crow - 1 if direction == 'up' else crow + 1
+        item = item_list.takeItem(crow)
+        item_list.insertItem(nrow, item)
+        item_list.setCurrentRow(nrow)
+
+    def remove_item(self, item_list):
+        crow = item_list.currentRow()
+        if crow < 0:
+            return  # Not selected
+        item_list.takeItem(crow)

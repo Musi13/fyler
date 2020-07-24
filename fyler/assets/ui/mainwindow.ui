@@ -16,13 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="topGrid">
-     <item row="0" column="1">
-      <widget class="QLabel" name="destTitle">
-       <property name="text">
-        <string>New Path</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="sourceTitle">
        <property name="text">
@@ -33,11 +26,120 @@
        </property>
       </widget>
      </item>
+     <item row="1" column="1">
+      <widget class="QListWidget" name="destList"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="destTitle">
+       <property name="text">
+        <string>New Path</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="0">
       <widget class="QListWidget" name="sourceList"/>
      </item>
-     <item row="1" column="1">
-      <widget class="QListWidget" name="destList"/>
+     <item row="2" column="0">
+      <layout class="QHBoxLayout" name="sourceHorizontal">
+       <item>
+        <spacer name="sourceLeftSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="sourceUpButton">
+         <property name="text">
+          <string>🡅</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="sourceDownButton">
+         <property name="text">
+          <string>🡇</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="sourceXButton">
+         <property name="text">
+          <string>❌</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="sourceRightSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="1">
+      <layout class="QHBoxLayout" name="destHorizontal">
+       <item>
+        <spacer name="destLeftSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="destUpButton">
+         <property name="text">
+          <string>🡅</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="destDownButton">
+         <property name="text">
+          <string>🡇</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="destXButton">
+         <property name="text">
+          <string>❌</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="destRightSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -75,6 +177,13 @@
       <widget class="QPushButton" name="settingsButton">
        <property name="text">
         <string>Settings</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QPushButton" name="advancedButton">
+       <property name="text">
+        <string>Advanced Tools</string>
        </property>
       </widget>
      </item>

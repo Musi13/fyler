@@ -7,6 +7,8 @@ API_ROOT = 'https://graphql.anilist.co/'
 
 
 class AniListProvider(provider.Provider):
+    name = 'AniList'
+
     def detail(self, series: provider.Series) -> provider.Series:
         """Adds more detail to a series, since we don't get everything from a search"""
         detail_qgl = '''
@@ -48,7 +50,7 @@ class AniListProvider(provider.Provider):
         for result, _ in zip(response.json()['data']['Page']['media'], range(5)):
             ret.append(
                 provider.Series(
-                    database='AniList',
+                    database=self.name,
                     title=result['title']['romaji'],
                     id=result['id'],
                     overview=None,

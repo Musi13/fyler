@@ -4,7 +4,7 @@ from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
 from PyQt5.QtCore import Qt
 
-from fyler import utils, settings, settings_handler
+from fyler import utils, settings, settings_handler, providers
 
 uifile = (Path(__file__) / '../../assets/ui/settingswindow.ui').resolve()
 SettingsWindowUI, SettingsWindowBase = uic.loadUiType(uifile)
@@ -18,14 +18,26 @@ class SettingsWindow(SettingsWindowUI, SettingsWindowBase):
 
 
     def load_settings(self):
-        self.providerEdit.setText(settings['provider'])
-        self.actionEdit.setText(settings['modify_action'])
+        current = 0
+        for idx, (key, value) in enumerate(providers.all_providers.items()):
+            self.providerBox.addItem(value.name, key)
+            if key == settings['provider']:
+                current = idx
+        self.providerBox.setCurrentIndex(current)
+
+        current = 0
+        for idx, (key, value) in enumerate(settings_handler.action_names.items()):
+            self.actionBox.addItem(value, key)
+            if key == settings['modify_action']:
+                current = idx
+        self.actionBox.setCurrentIndex(current)
+
         self.formatEdit.setText(settings['output_format'])
 
     def save_settings(self):
         newsettings = {
-            'provider': self.providerEdit.text(),
-            'modify_action': self.actionEdit.text(),
+            'provider': self.providerBox.currentData(),
+            'modify_action': self.actionBox.currentData(),
             'output_format': self.formatEdit.text(),
         }
         settings.update(newsettings)

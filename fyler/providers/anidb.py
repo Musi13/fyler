@@ -41,6 +41,8 @@ def _raw_get_info(id: int) -> str:
 
 
 class AniDBProvider(provider.Provider):
+    name = 'AniDB'
+
     def detail(self, series):
         return self.get_info(series.id)
 
@@ -107,7 +109,7 @@ class AniDBProvider(provider.Provider):
     def search(self, query: str) -> list:
         return [
             provider.Series(
-                database='AniDB',
+                database=self.name,
                 title=k[3],
                 id=int(k[0]),
                 overview=None,
