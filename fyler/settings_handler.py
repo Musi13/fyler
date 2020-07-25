@@ -4,6 +4,7 @@ from collections import UserDict
 from appdirs import AppDirs
 
 from fyler.providers import all_providers
+from fyler.utils import noop_action, relative_symlink
 
 dirs = AppDirs('fyler', 'fyler')
 CONFIG_FILE = os.environ.get('FYLER_CONFIG_FILE', os.path.join(dirs.user_config_dir, 'config.json'))
@@ -11,15 +12,20 @@ CONFIG_FILE = os.environ.get('FYLER_CONFIG_FILE', os.path.join(dirs.user_config_
 # internal name -> func
 _action_funcs = {
     'rename': os.rename,
-    'symlink': os.symlink,
-    # TODO: Change 'symlink' to 'absolute_symlink', add a 'relative_symlink'
+    'absolute_symlink': os.symlink,
+    'relative_symlink': relative_symlink,
+    'hardlink': os.link,
+    'noop': noop_action,
 }
 
 # internal name -> friendly name
 # TODO: one dict? More confusing but no duplication
 action_names = {
     'rename': 'Rename',
-    'symlink': 'Symlink',
+    'absolute_symlink': 'Absolute Symlink',
+    'relative_symlink': 'Relative Symlink',
+    'hardlink': 'Hardlink',
+    'noop': 'No-op (Debug)',
 }
 
 class SettingsDict(UserDict):

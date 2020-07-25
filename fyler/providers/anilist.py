@@ -1,15 +1,15 @@
 import requests
-import json
 
-from . import provider
+from .provider import Provider
+from fyler.models import Series
 
 API_ROOT = 'https://graphql.anilist.co/'
 
 
-class AniListProvider(provider.Provider):
+class AniListProvider(Provider):
     name = "AniList (Doesn't work. No episode data)"
 
-    def detail(self, series: provider.Series) -> provider.Series:
+    def detail(self, series: Series) -> Series:
         """Adds more detail to a series, since we don't get everything from a search"""
         detail_qgl = '''
         '''
@@ -49,7 +49,7 @@ class AniListProvider(provider.Provider):
         ret = []
         for result, _ in zip(response.json()['data']['Page']['media'], range(5)):
             ret.append(
-                provider.Series(
+                Series(
                     database=self.name,
                     title=result['title']['romaji'],
                     id=result['id'],

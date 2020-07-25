@@ -36,7 +36,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
 
         self.matchButton.clicked.connect(self.match_sources)
         self.actionButton.clicked.connect(self.process_action)
-        self.actionButton.setText(settings['modify_action'].title())
+        self.actionButton.setText(settings_handler.action_names[settings['modify_action']])
 
         self.sourceUpButton.clicked.connect(lambda: self.move_item(self.sourceList, 'up'))
         self.sourceDownButton.clicked.connect(lambda: self.move_item(self.sourceList, 'down'))
@@ -76,23 +76,14 @@ class MainWindow(MainWindowUI, MainWindowBase):
         for i in range(self.destList.count()):
             item = self.destList.item(i)
             episode = item.data(Qt.UserRole)
-            # TODO: These formats are failing because of invalid types (sometimes things are None),
-            # it would be nice if those cases resulted in a * or something
-            env = {
-                'n': episode.series.title,
-                's': episode.season_number,
-                'e': episode.episode_number,
-                'sxe': f'{episode.season_number}x{episode.episode_number:02}',
-                's00e00': f'S{episode.season_number:02}E{episode.episode_number:02}' if episode.season_number and episode.episode_number else '*',
-                'e00': f'{episode.episode_number:02}',
-                't': episode.title,
-                'id': episode.id,
-            }
-            # TODO: Blindly replacing slashes doesn't work because the format
-            # may be a path; we need to figure out what slashes are inentional and only
-            # remove the ones from the filename. (Or just remove slashes from every env value)
+            # TODO: Formats can fail because of invalid types (sometimes things are None),
+            # it would be nice if those cases resulted in a * or something without explicitly
+            # handling it in every template_values()
+            env = episode.template_values()
+            for key, value in env.items():
+                env[key] = str(value).replace('/', '&')
             # Ampherstand chosen since most use cases are for multiple shorts in one episode
-            dest = settings['output_format'].format(**env).replace('/', '&')
+            dest = settings['output_format'].format(**env)
             item.setText(dest)
 
     def match_sources(self):
@@ -112,9 +103,8 @@ class MainWindow(MainWindowUI, MainWindowBase):
 
     def process_action(self):
         for source, dest in zip(listwidget_data_items(self.sourceList), listwidget_text_items(self.destList)):
-            action = settings['modify_action']  # TODO: settings.action()
             extension = os.path.splitext(source)[1]
-            print(f'{action}({source}, {dest}{extension})')
+            settings.action()(source, dest + extension)
 
     def edit_settings(self):
         window = SettingsWindow()

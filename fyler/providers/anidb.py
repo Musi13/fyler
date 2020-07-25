@@ -13,7 +13,8 @@ import heapq
 
 from appdirs import AppDirs
 
-from . import provider
+from .provider import Provider
+from fyler.models import Media, Series, Episode, Movie
 
 dirs = AppDirs('fyler', 'fyler')
 _cache_dir = Path(dirs.user_cache_dir) / 'anidb'
@@ -43,13 +44,13 @@ def _raw_get_info(id: int) -> str:
     return _rl_get('http://api.anidb.net:9001/httpapi', params=args).text
 
 
-class AniDBProvider(provider.Provider):
+class AniDBProvider(Provider):
     name = 'AniDB'
 
     def detail(self, series):
         return self.get_info(series.id)
 
-    def get_info(self, id: int) -> provider.Media:
+    def get_info(self, id: int) -> Media:
         xml = _raw_get_info(id)
         soup = BeautifulSoup(xml, 'xml')
         anime = soup.find('anime')
@@ -57,8 +58,6 @@ class AniDBProvider(provider.Provider):
         anime_kwargs = {
             'database': 'AniDB',
             'id': id,
-            'overview': anime.find('description').text,
-            'rating': float(anime.find('ratings').find('permanent').text),
         }
         for title in anime.find('titles').find_all('title'):
             if title.attrs['type'] == 'main':
@@ -78,23 +77,21 @@ class AniDBProvider(provider.Provider):
                     'id': int(episode.attrs['id']),
                     'season_number': None,
                     'episode_number': int(episode.find('epno').text),  # I want this to be an int, but sometimes its different (specials?)
-                    'overview': episode.find('summary').text if episode.find('summary') else None,
-                    'rating': float(episode.find('rating').text),
                 }
                 for title in episode.find_all('title'):
                     if title.attrs['xml:lang'] == 'en':
                         episode_kwargs['title'] = title.text
                         break
-                episodes.append(provider.Episode(**episode_kwargs))
+                episodes.append(Episode(**episode_kwargs))
             episodes.sort(key=lambda x: x.episode_number)
             anime_kwargs['episodes'] = episodes
 
-            s = provider.Series(**anime_kwargs)
+            s = Series(**anime_kwargs)
             for e in s.episodes:
                 e.series = s
             return s
         elif anime.find('type').text == 'Movie':
-            return provider.Movie(**anime_kwargs)
+            return Movie(**anime_kwargs)
         else:
             raise ValueError('Anime is not a TV Series or Movie')
 
@@ -132,12 +129,10 @@ class AniDBProvider(provider.Provider):
 
     def search(self, query: str) -> list:
         return [
-            provider.Series(
+            Series(
                 database=self.name,
                 title=k[3],
                 id=int(k[0]),
-                overview=None,
-                rating=None,
                 episodes=[],
             )
             for k in self._search_by_name(query)
