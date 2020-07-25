@@ -52,5 +52,5 @@ def noop_action(source, dest):
 
 def relative_symlink(source, dest):
     """Like symlink, but the link is relative (for portability)"""
-    relsource = os.path.relpath(source, dest)
+    relsource = os.path.relpath(source, os.path.dirname(dest))
     return os.symlink(relsource, dest)

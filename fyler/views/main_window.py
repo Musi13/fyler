@@ -76,6 +76,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
                     filepath = os.path.abspath(item)
                     qtitem = listwidget_item(os.path.basename(filepath), filepath)
                     self.sourceList.addItem(qtitem)
+            self.sourceList.sortItems()
 
         t = 'directory' if directory else 'files'
         msg = self.tr(f"Choose {t} to rename")
@@ -129,9 +130,17 @@ class MainWindow(MainWindowUI, MainWindowBase):
             self._update_dest_paths()
 
     def process_action(self):
-        for source, dest in zip(listwidget_data_items(self.sourceList), listwidget_text_items(self.destList)):
+        # Loop through rows, but always use top item to delete after its done
+        num_actions = min(self.sourceList.count(), self.destList.count())
+        for _ in range(num_actions):
+            source = self.sourceList.item(0).data(Qt.UserRole)
+            dest = os.path.expanduser(os.path.expandvars(self.destList.item(0).text()))
             extension = os.path.splitext(source)[1]
+            if destdir := os.path.dirname(dest):
+                os.makedirs(destdir, exist_ok=True)
             settings.action()(source, dest + extension)
+            self.sourceList.takeItem(0)
+            self.destList.takeItem(0)
 
     def edit_settings(self):
         window = SettingsWindow()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.8
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # Package meta-data.
 DESCRIPTION = 'An application to help organize TV Shows/Anime/Movies'
@@ -26,7 +26,8 @@ setup(
     long_description=DESCRIPTION,
     author='Alex Gonzales<musigonzales@gmail.com>',
     python_requires='>=3.8.0',
-    packages=['fyler', 'fyler.providers'],
+    packages=find_packages(exclude=['tests']),
+    package_data={'fyler.assets': ['*.ui']},
     entry_points={
         'gui_scripts': ['fyler=fyler.__main__:main'],
         'fyler.providers': [
