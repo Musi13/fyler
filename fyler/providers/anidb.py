@@ -1,5 +1,4 @@
 import csv
-import heapq
 import logging
 import zlib
 from datetime import date
@@ -7,7 +6,6 @@ from pathlib import Path
 
 import bs4
 import requests
-import textdistance
 from appdirs import AppDirs
 from bs4 import BeautifulSoup
 from diskcache import Cache
