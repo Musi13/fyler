@@ -29,8 +29,16 @@ class MainWindow(MainWindowUI, MainWindowBase):
         super().__init__()
         self.setupUi(self)
 
-        # TODO: Add buttons/hotkeys for reassigning matches
-        # TODO: Scroll the two lists together
+        # Scroll lists together
+        self.sourceList.verticalScrollBar().valueChanged.connect(
+            self.destList.verticalScrollBar().setValue)
+        self.destList.verticalScrollBar().valueChanged.connect(
+            self.sourceList.verticalScrollBar().setValue)
+
+        # Select from lists together
+        self.sourceList.currentRowChanged.connect(self.destList.setCurrentRow)
+        self.destList.currentRowChanged.connect(self.sourceList.setCurrentRow)
+
         self.folderButton.clicked.connect(lambda: self.add_sources(directory=True))
         self.filesButton.clicked.connect(lambda: self.add_sources(directory=False))
 
@@ -74,17 +82,20 @@ class MainWindow(MainWindowUI, MainWindowBase):
     def _update_dest_paths(self):
         """Update the paths based on format and episode data"""
         for i in range(self.destList.count()):
-            item = self.destList.item(i)
-            episode = item.data(Qt.UserRole)
+            qtitem = self.destList.item(i)
+            item = qtitem.data(Qt.UserRole)
             # TODO: Formats can fail because of invalid types (sometimes things are None),
             # it would be nice if those cases resulted in a * or something without explicitly
             # handling it in every template_values()
-            env = episode.template_values()
+            env = item.template_values()
             for key, value in env.items():
                 env[key] = str(value).replace('/', '&')
             # Ampherstand chosen since most use cases are for multiple shorts in one episode
-            dest = settings['output_format'].format(**env)
-            item.setText(dest)
+            try:
+                dest = settings['output_format'].format(**env)
+            except KeyError as e:
+                dest = f"*Error: Template variable {e} not found*"
+            qtitem.setText(dest)
 
     def match_sources(self):
         if self.sourceList.count() <= 0:
@@ -96,8 +107,8 @@ class MainWindow(MainWindowUI, MainWindowBase):
         window.show()
         if window.exec_():
             self.destList.clear()
-            for episode in window.result.episodes:
-                qtitem = listwidget_item('{placeholder}', episode)
+            for item in window.result.items():
+                qtitem = listwidget_item('{placeholder}', item)
                 self.destList.addItem(qtitem)
             self._update_dest_paths()
 

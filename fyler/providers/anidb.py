@@ -2,6 +2,7 @@ import csv
 from pathlib import Path
 import logging
 import zlib
+from datetime import date
 
 import requests
 import textdistance
@@ -40,15 +41,15 @@ def _raw_get_info(id: int) -> str:
         'protover': '1',
         'aid': str(id),
     }
-    print('Requesting from AniDB')
+    logger.debug('Requesting from AniDB')
     return _rl_get('http://api.anidb.net:9001/httpapi', params=args).text
 
 
 class AniDBProvider(Provider):
     name = 'AniDB'
 
-    def detail(self, series):
-        return self.get_info(series.id)
+    def detail(self, media):
+        return self.get_info(media.id)
 
     def get_info(self, id: int) -> Media:
         xml = _raw_get_info(id)
@@ -58,6 +59,7 @@ class AniDBProvider(Provider):
         anime_kwargs = {
             'database': 'AniDB',
             'id': id,
+            'date': date.fromisoformat(anime.find('startdate').text),
         }
         for title in anime.find('titles').find_all('title'):
             if title.attrs['type'] == 'main':
@@ -75,6 +77,7 @@ class AniDBProvider(Provider):
                     'database': 'AniDB',
                     'series': None,  # Will be set later
                     'id': int(episode.attrs['id']),
+                    'date': date.fromisoformat(episode.find('airdate').text),
                     'season_number': None,
                     'episode_number': int(episode.find('epno').text),  # I want this to be an int, but sometimes its different (specials?)
                 }
@@ -129,11 +132,11 @@ class AniDBProvider(Provider):
 
     def search(self, query: str) -> list:
         return [
-            Series(
+            Media(
                 database=self.name,
                 title=k[3],
                 id=int(k[0]),
-                episodes=[],
+                date=None,
             )
             for k in self._search_by_name(query)
         ]

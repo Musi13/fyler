@@ -1,4 +1,5 @@
 import requests
+from datetime import date
 
 from .provider import Provider
 from fyler.models import Series
@@ -26,11 +27,6 @@ class AniListProvider(Provider):
                     english
                     native
                   }
-                  coverImage {
-                    medium
-                    large
-                    extraLarge
-                  }
                   startDate {
                     year
                     month
@@ -53,8 +49,11 @@ class AniListProvider(Provider):
                     database=self.name,
                     title=result['title']['romaji'],
                     id=result['id'],
-                    overview=None,
-                    rating=None,
+                    date=date(
+                        int(result['startDate']['year']),
+                        int(result['startDate']['month']),
+                        int(result['startDate']['day']),
+                    ),
                     episodes=[],
                 ))
 

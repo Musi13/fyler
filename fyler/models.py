@@ -1,12 +1,15 @@
 import dataclasses
 from dataclasses import dataclass
 
+from datetime import date
+
 
 @dataclass
 class Media:
     id: int
     database: str
     title: str
+    date: date
 
     # I wish dataclasses had this interface naturally,
     # it's a bit more convenient imo.
@@ -16,17 +19,25 @@ class Media:
     def astuple(self):
         return dataclasses.astuple(self)
 
+    def items(self):
+        """Returns an iterable for things to rename to"""
+        raise NotImplementedError()
+
     def template_values(self) -> dict:
         return {
             'id': self.id,
             'db': self.database,
             't': self.title,
+            'y': self.date.year,
         }
 
 
 @dataclass
 class Series(Media):
     episodes: list
+
+    def items(self):
+        return self.episodes
 
 
 @dataclass
@@ -48,4 +59,5 @@ class Episode(Media):
 
 @dataclass
 class Movie(Media):
-    pass
+    def items(self):
+        return [self]
