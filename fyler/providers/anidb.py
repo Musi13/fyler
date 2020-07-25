@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
 import logging
+import zlib
 
 import requests
 import textdistance
@@ -10,15 +11,17 @@ import bs4
 from bs4 import BeautifulSoup
 import heapq
 
+from appdirs import AppDirs
+
 from . import provider
 
-_titles_dat = Path(__file__).parent / 'data/anime-titles.dat'
-_cache_dir = Path.home() / '.cache/fyler'
-
+dirs = AppDirs('fyler', 'fyler')
+_cache_dir = Path(dirs.user_cache_dir) / 'anidb'
+_titles_dat = Path(dirs.user_cache_dir) / 'anidb/data/anime-titles.dat'
 _cache_dir.mkdir(parents=True, exist_ok=True)
 cache = Cache(directory=str(_cache_dir))
 
-# logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 @sleep_and_retry
@@ -71,7 +74,7 @@ class AniDBProvider(provider.Provider):
                     continue
                 episode_kwargs = {
                     'database': 'AniDB',
-                    'series_id': id,
+                    'series': None,  # Will be set later
                     'id': int(episode.attrs['id']),
                     'season_number': None,
                     'episode_number': int(episode.find('epno').text),  # I want this to be an int, but sometimes its different (specials?)
@@ -86,17 +89,38 @@ class AniDBProvider(provider.Provider):
             episodes.sort(key=lambda x: x.episode_number)
             anime_kwargs['episodes'] = episodes
 
-            return provider.Series(**anime_kwargs)
+            s = provider.Series(**anime_kwargs)
+            for e in s.episodes:
+                e.series = s
+            return s
         elif anime.find('type').text == 'Movie':
             return provider.Movie(**anime_kwargs)
         else:
             raise ValueError('Anime is not a TV Series or Movie')
 
-    def _search_by_name(self, query: str) -> int:
+    def download_title_data(self):
+        _titles_dat.parent.mkdir(parents=True, exist_ok=True)
+        with open(_titles_dat, 'wb') as dat:
+            with requests.get(
+                'https://anidb.net/api/anime-titles.dat.gz',
+                headers={'User-Agent': 'fyler'},
+                stream=True
+            ) as response:
+                response.raise_for_status()
+                z = zlib.decompressobj(wbits=zlib.MAX_WBITS | 16)  # Detect gzip automatically
+                for chunk in response.iter_content(chunk_size=8192):
+                    dat.write(z.decompress(chunk))
+                dat.write(z.flush())
+
+    def _search_by_name(self, query: str) -> list:
         """
         Searches for the closest match to query. Note that this function
         loads the dat file every time, and is not recommended for multiple searches.
         """
+        if not _titles_dat.exists():
+            logger.info('AniDB title data not found. Downloading fresh copy...')
+            self.download_title_data()
+
         key = lambda x: textdistance.levenshtein.normalized_similarity(query, x[3])
         with open(_titles_dat, newline='') as f:
             # Filter by primary title

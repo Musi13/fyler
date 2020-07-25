@@ -8,6 +8,7 @@ from fyler import utils, settings, settings_handler
 from fyler.utils import listwidget_text_items, listwidget_data_items, listwidget_item
 from fyler.views.search_window import SearchWindow
 from fyler.views.settings_window import SettingsWindow
+from fyler.views.advanced_window import AdvancedWindow
 
 uifile = (Path(__file__) / '../../assets/ui/mainwindow.ui').resolve()
 MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
@@ -45,9 +46,8 @@ class MainWindow(MainWindowUI, MainWindowBase):
         self.sourceXButton.clicked.connect(lambda: self.remove_item(self.sourceList))
         self.destXButton.clicked.connect(lambda: self.remove_item(self.destList))
 
-
-
         self.settingsButton.clicked.connect(self.edit_settings)
+        self.advancedButton.clicked.connect(self.open_advanced)
 
     def add_sources(self, directory):
         def receive():
@@ -71,6 +71,30 @@ class MainWindow(MainWindowUI, MainWindowBase):
         dialog = choose_sources_dialog(self, msg, directory=directory)
         dialog.open(receive)
 
+    def _update_dest_paths(self):
+        """Update the paths based on format and episode data"""
+        for i in range(self.destList.count()):
+            item = self.destList.item(i)
+            episode = item.data(Qt.UserRole)
+            # TODO: These formats are failing because of invalid types (sometimes things are None),
+            # it would be nice if those cases resulted in a * or something
+            env = {
+                'n': episode.series.title,
+                's': episode.season_number,
+                'e': episode.episode_number,
+                'sxe': f'{episode.season_number}x{episode.episode_number:02}',
+                's00e00': f'S{episode.season_number:02}E{episode.episode_number:02}' if episode.season_number and episode.episode_number else '*',
+                'e00': f'{episode.episode_number:02}',
+                't': episode.title,
+                'id': episode.id,
+            }
+            # TODO: Blindly replacing slashes doesn't work because the format
+            # may be a path; we need to figure out what slashes are inentional and only
+            # remove the ones from the filename. (Or just remove slashes from every env value)
+            # Ampherstand chosen since most use cases are for multiple shorts in one episode
+            dest = settings['output_format'].format(**env).replace('/', '&')
+            item.setText(dest)
+
     def match_sources(self):
         if self.sourceList.count() <= 0:
             return
@@ -82,21 +106,9 @@ class MainWindow(MainWindowUI, MainWindowBase):
         if window.exec_():
             self.destList.clear()
             for episode in window.result.episodes:
-                env = window.result.asdict()
-                # TODO: These formats are failing because of invalid types (sometimes things are None),
-                # it would be nice if those cases resulted in a * or something
-                env.update({
-                    'n': window.result.title,
-                    's': episode.season_number,
-                    'e': episode.episode_number,
-                    'sxe': f'{episode.season_number}x{episode.episode_number:02}',
-                    's00e00': f'S{episode.season_number:02}E{episode.episode_number:02}' if episode.season_number and episode.episode_number else '*',
-                    'e00': f'{episode.episode_number:02}',
-                    't': episode.title,
-                    'id': episode.id,
-                })
-                dest = settings['output_format'].format(**env).replace('/', '&')
-                self.destList.addItem(dest)
+                qtitem = listwidget_item('{placeholder}', episode)
+                self.destList.addItem(qtitem)
+            self._update_dest_paths()
 
     def process_action(self):
         for source, dest in zip(listwidget_data_items(self.sourceList), listwidget_text_items(self.destList)):
@@ -110,7 +122,13 @@ class MainWindow(MainWindowUI, MainWindowBase):
         window.show()
         window.exec_()
         self.actionButton.setText(settings_handler.action_names[settings['modify_action']])
-        # TODO: Re-evaluate all destList items with output_format
+        self._update_dest_paths()
+
+    def open_advanced(self):
+        window = AdvancedWindow()
+        window.setParent(self, Qt.Sheet)
+        window.show()
+        window.exec_()
 
     def move_item(self, item_list, direction):
         crow = item_list.currentRow()

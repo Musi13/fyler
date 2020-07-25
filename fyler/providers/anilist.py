@@ -7,7 +7,7 @@ API_ROOT = 'https://graphql.anilist.co/'
 
 
 class AniListProvider(provider.Provider):
-    name = 'AniList'
+    name = "AniList (Doesn't work. No episode data)"
 
     def detail(self, series: provider.Series) -> provider.Series:
         """Adds more detail to a series, since we don't get everything from a search"""

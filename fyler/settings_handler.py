@@ -1,6 +1,6 @@
 import os
 import json
-from collections import  UserDict
+from collections import UserDict
 from appdirs import AppDirs
 
 from fyler.providers import all_providers
@@ -12,6 +12,7 @@ CONFIG_FILE = os.environ.get('FYLER_CONFIG_FILE', os.path.join(dirs.user_config_
 _action_funcs = {
     'rename': os.rename,
     'symlink': os.symlink,
+    # TODO: Change 'symlink' to 'absolute_symlink', add a 'relative_symlink'
 }
 
 # internal name -> friendly name

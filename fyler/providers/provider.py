@@ -21,15 +21,15 @@ class Media:
 
 
 @dataclass
-class Episode(Media):
-    series_id: int
-    episode_number: int
-    season_number: int
+class Series(Media):
+    episodes: list
 
 
 @dataclass
-class Series(Media):
-    episodes: list
+class Episode(Media):
+    series: Series
+    episode_number: int
+    season_number: int
 
 
 @dataclass
