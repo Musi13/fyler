@@ -1,8 +1,9 @@
-import requests
 from datetime import date
 
-from .provider import Provider
+import requests
+
 from fyler.models import Series
+from .provider import Provider
 
 API_ROOT = 'https://graphql.anilist.co/'
 
@@ -11,9 +12,7 @@ class AniListProvider(Provider):
     name = "AniList (Doesn't work. No episode data)"
 
     def detail(self, series: Series) -> Series:
-        """Adds more detail to a series, since we don't get everything from a search"""
-        detail_qgl = '''
-        '''
+        """AniList doesn't have episode data, so nothing to add"""
         return series
 
     def search(self, query: str) -> list:

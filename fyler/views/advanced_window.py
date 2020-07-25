@@ -1,5 +1,4 @@
 from importlib import resources
-from pathlib import Path
 from PyQt5 import uic
 from fyler import providers, assets
 
@@ -8,6 +7,7 @@ AdvancedWindowUI, AdvancedWindowBase = uic.loadUiType(uifile)
 
 
 class AdvancedWindow(AdvancedWindowUI, AdvancedWindowBase):
+    """Window for Advanced Tools, usually special action that don't happen often"""
     def __init__(self):
         super().__init__()
         self.setupUi(self)

@@ -28,22 +28,27 @@ action_names = {
     'noop': 'No-op (Debug)',
 }
 
+
 class SettingsDict(UserDict):
     appdirs = dirs
+
     def provider(self):
         return all_providers[self['provider']]
 
     def action(self):
         return _action_funcs[self['modify_action']]
 
+
 def default_settings():
     return SettingsDict({
         'provider': 'anilist',
-        'modify_action': 'symlink',
+        'modify_action': 'rename',
         'output_format': '{n} - {s00e00} - {t}'
     })
 
+
 def load_settings(filepath=CONFIG_FILE):
+    """Load settings from `filepath`"""
     ret = default_settings()
     try:
         with open(filepath) as f:
@@ -52,9 +57,12 @@ def load_settings(filepath=CONFIG_FILE):
         pass
     return ret
 
+
 settings = load_settings()
 
+
 def save_settings(filepath=CONFIG_FILE):
+    """Save settings to `filepath`"""
     if not os.path.exists(CONFIG_FILE):
         os.makedirs(os.path.dirname(CONFIG_FILE), mode=0o775, exist_ok=True)
     with open(CONFIG_FILE, 'w') as f:

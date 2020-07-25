@@ -1,14 +1,12 @@
-import os
 from importlib import resources
-from pathlib import Path
-from PyQt5 import uic, QtCore
-from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
-from PyQt5.QtCore import Qt
 
-from fyler import utils, settings, settings_handler, providers, assets
+from PyQt5 import uic
+
+from fyler import settings, settings_handler, providers, assets
 
 uifile = resources.open_text(assets, 'settingswindow.ui')
 SettingsWindowUI, SettingsWindowBase = uic.loadUiType(uifile)
+
 
 class SettingsWindow(SettingsWindowUI, SettingsWindowBase):
     def __init__(self):
@@ -16,7 +14,6 @@ class SettingsWindow(SettingsWindowUI, SettingsWindowBase):
         self.setupUi(self)
         self.load_settings()
         self.saveButton.clicked.connect(self.save_settings)
-
 
     def load_settings(self):
         current = 0

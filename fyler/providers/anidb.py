@@ -1,22 +1,22 @@
 import csv
-from pathlib import Path
+import heapq
 import logging
 import zlib
 from datetime import date
+from pathlib import Path
 
+import bs4
 import requests
 import textdistance
-from ratelimit import limits, sleep_and_retry
-from diskcache import Cache
-import bs4
-from bs4 import BeautifulSoup
-import heapq
-
 from appdirs import AppDirs
+from bs4 import BeautifulSoup
+from diskcache import Cache
+from ratelimit import limits, sleep_and_retry
 
-from .provider import Provider
 from fyler.models import Media, Series, Episode, Movie
+from .provider import Provider
 
+# Redefine dirs since importing settings causes a circular import
 dirs = AppDirs('fyler', 'fyler')
 _cache_dir = Path(dirs.user_cache_dir) / 'anidb'
 _titles_dat = Path(dirs.user_cache_dir) / 'anidb/data/anime-titles.dat'
@@ -48,17 +48,14 @@ def _raw_get_info(id: int) -> str:
 class AniDBProvider(Provider):
     name = 'AniDB'
 
-    def detail(self, media):
-        return self.get_info(media.id)
-
-    def get_info(self, id: int) -> Media:
-        xml = _raw_get_info(id)
+    def detail(self, media: Media) -> Media:
+        xml = _raw_get_info(media.id)
         soup = BeautifulSoup(xml, 'xml')
         anime = soup.find('anime')
 
         anime_kwargs = {
             'database': 'AniDB',
-            'id': id,
+            'id': media.id,
             'date': date.fromisoformat(anime.find('startdate').text),
         }
         for title in anime.find('titles').find_all('title'):
@@ -78,7 +75,7 @@ class AniDBProvider(Provider):
                     'series': None,  # Will be set later
                     'id': int(episode.attrs['id']),
                     'date': date.fromisoformat(episode.find('airdate').text),
-                    'season_number': None,
+                    'season_number': 0,  # Anime doesn't really do seasons normally...
                     'episode_number': int(episode.find('epno').text),  # I want this to be an int, but sometimes its different (specials?)
                 }
                 for title in episode.find_all('title'):
@@ -99,6 +96,7 @@ class AniDBProvider(Provider):
             raise ValueError('Anime is not a TV Series or Movie')
 
     def download_title_data(self):
+        """Download and cache anime titles from AniDB"""
         _titles_dat.parent.mkdir(parents=True, exist_ok=True)
         with open(_titles_dat, 'wb') as dat:
             with requests.get(
@@ -121,9 +119,9 @@ class AniDBProvider(Provider):
             logger.info('AniDB title data not found. Downloading fresh copy...')
             self.download_title_data()
 
+        # Filter by primary title
         key = lambda x: textdistance.levenshtein.normalized_similarity(query, x[3])
         with open(_titles_dat, newline='') as f:
-            # Filter by primary title
             reader = csv.reader(f, delimiter='|')
             for _ in range(3):
                 next(reader)  # Header

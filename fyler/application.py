@@ -1,7 +1,6 @@
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMessageBox, QApplication
-
+from PyQt5.QtWidgets import QApplication
 from fyler.views.main_window import MainWindow
+
 
 class FylerApp(QApplication):
     def __init__(self, args_raw):

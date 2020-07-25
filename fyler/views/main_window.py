@@ -1,16 +1,15 @@
 import os
 from importlib import resources
-from pathlib import Path
-from PyQt5 import uic, QtCore
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtCore import Qt
 
-from fyler import utils, settings, settings_handler
+from PyQt5 import uic, QtCore
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QFileDialog
+
+from fyler import assets, utils, settings, settings_handler
 from fyler.utils import listwidget_text_items, listwidget_data_items, listwidget_item
+from fyler.views.advanced_window import AdvancedWindow
 from fyler.views.search_window import SearchWindow
 from fyler.views.settings_window import SettingsWindow
-from fyler.views.advanced_window import AdvancedWindow
-from fyler import assets
 
 uifile = resources.open_text(assets, 'mainwindow.ui')
 MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
@@ -59,7 +58,8 @@ class MainWindow(MainWindowUI, MainWindowBase):
         self.settingsButton.clicked.connect(self.edit_settings)
         self.advancedButton.clicked.connect(self.open_advanced)
 
-    def add_sources(self, directory):
+    def add_sources(self, directory: bool):
+        """Open file selection dialog and load choices into sourceList"""
         def receive():
             self.sourceList.clear()
             self.destList.clear()
@@ -103,6 +103,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
         if self.sourceList.count() <= 0:
             return
 
+        # Guess title by removing some noise and taking longest common prefix
         guess = utils.guess_title(*listwidget_text_items(self.sourceList))
         window = SearchWindow(guess)
         window.setParent(self, Qt.Sheet)
@@ -138,6 +139,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
         if crow < 0:
             return  # Not selected
 
+        # Qt will handle out of bounds selections
         nrow = crow - 1 if direction == 'up' else crow + 1
         item = item_list.takeItem(crow)
         item_list.insertItem(nrow, item)
