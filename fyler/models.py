@@ -28,7 +28,7 @@ class Media:
             'id': self.id,
             'db': self.database,
             't': self.title,
-            'y': self.date.year,
+            'y': self.date.year if self.date else '*',
         }
 
 

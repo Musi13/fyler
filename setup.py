@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.8
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 # Package meta-data.
 NAME = ''
@@ -13,14 +13,11 @@ VERSION = '0+unknown'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    # CLI
-    'click',
-
     # UI
     'PyQT5',
 
     # AniDB
-    'textdistance[extras]',
+    'fuzzywuzzy[speedup]',
     'ratelimit',
     'diskcache',
     'beautifulsoup4',
@@ -29,7 +26,6 @@ REQUIRED = [
     # General
     'requests',
     'appdirs',
-    'pluggy',
 ]
 
 

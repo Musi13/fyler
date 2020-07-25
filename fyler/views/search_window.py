@@ -17,6 +17,7 @@ class SearchWindow(SearchWindowUI, SearchWindowBase):
 
         # TODO: Consider changing the search text to something like "Search ({provider})"
         self.searchButton.clicked.connect(self.do_search)
+        self.searchButton.setText(f'Search {settings.provider().name}')
         self.resultList.itemDoubleClicked.connect(self.accept_result)
 
         if initial_query:
@@ -35,5 +36,6 @@ class SearchWindow(SearchWindowUI, SearchWindowBase):
         results = settings.provider().search(self.searchBox.text())
 
         for item in results:
-            qtitem = utils.listwidget_item(item.title, item)
+            text = settings['search_result_format'].format(**item.template_values())
+            qtitem = utils.listwidget_item(text, item)
             self.resultList.addItem(qtitem)

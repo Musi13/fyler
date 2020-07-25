@@ -43,7 +43,8 @@ def default_settings():
     return SettingsDict({
         'provider': 'anilist',
         'modify_action': 'rename',
-        'output_format': '{n} - {s00e00} - {t}'
+        'output_format': '{n} - {s00e00} - {t}',
+        'search_result_format': '{t}',
     })
 
 

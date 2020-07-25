@@ -31,12 +31,14 @@ class SettingsWindow(SettingsWindowUI, SettingsWindowBase):
         self.actionBox.setCurrentIndex(current)
 
         self.formatEdit.setText(settings['output_format'])
+        self.searchEdit.setText(settings['search_result_format'])
 
     def save_settings(self):
         newsettings = {
             'provider': self.providerBox.currentData(),
             'modify_action': self.actionBox.currentData(),
             'output_format': self.formatEdit.text(),
+            'search_result_format': self.searchEdit.text(),
         }
         settings.update(newsettings)
         settings_handler.save_settings()

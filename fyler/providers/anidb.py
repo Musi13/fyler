@@ -11,6 +11,7 @@ import textdistance
 from appdirs import AppDirs
 from bs4 import BeautifulSoup
 from diskcache import Cache
+from fuzzywuzzy import process
 from ratelimit import limits, sleep_and_retry
 
 from fyler.models import Media, Series, Episode, Movie
@@ -119,14 +120,13 @@ class AniDBProvider(Provider):
             logger.info('AniDB title data not found. Downloading fresh copy...')
             self.download_title_data()
 
-        # Filter by primary title
-        key = lambda x: textdistance.levenshtein.normalized_similarity(query, x[3])
         with open(_titles_dat, newline='') as f:
             reader = csv.reader(f, delimiter='|')
             for _ in range(3):
                 next(reader)  # Header
+            # Filter by primary title
             reader = filter(lambda k: int(k[1]) == 1, reader)
-            return heapq.nlargest(10, reader, key=key)
+            return [k[0] for k in process.extract(query, reader, limit=10)]
 
     def search(self, query: str) -> list:
         return [
