@@ -118,7 +118,7 @@ class AniDBProvider(Provider):
             logger.info('AniDB title data not found. Downloading fresh copy...')
             self.download_title_data()
 
-        with open(_titles_dat, newline='') as f:
+        with open(_titles_dat, newline='', encoding='utf-8') as f:
             reader = csv.reader(f, delimiter='|')
             for _ in range(3):
                 next(reader)  # Header

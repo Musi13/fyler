@@ -1,4 +1,5 @@
 import os
+import platform
 from importlib import resources
 
 from PyQt5 import uic, QtCore
@@ -83,6 +84,19 @@ class MainWindow(MainWindowUI, MainWindowBase):
 
     def _update_dest_paths(self):
         """Update the paths based on format and episode data"""
+        # Ampherstand chosen since most use cases are for multiple shorts in one episode
+        chartab = {ord('/'): '&'}
+        if 'windows' in platform.platform().lower():
+            chartab.update({
+                ord(':'): ' -',
+                ord('\\'): None,
+                ord('"'): "'",
+                ord('<'): None,
+                ord('>'): None,
+                ord('?'): None,
+                ord('*'): '!',
+                ord('|'): None,
+            })
         for i in range(self.destList.count()):
             qtitem = self.destList.item(i)
             item = qtitem.data(Qt.UserRole)
@@ -91,8 +105,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
             # handling it in every template_values()
             env = item.template_values()
             for key, value in env.items():
-                env[key] = str(value).replace('/', '&')
-            # Ampherstand chosen since most use cases are for multiple shorts in one episode
+                env[key] = str(value).translate(chartab)
             try:
                 dest = settings['output_format'].format(**env)
             except KeyError as e:
