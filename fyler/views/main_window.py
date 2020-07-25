@@ -1,7 +1,8 @@
 import os
+from importlib import resources
 from pathlib import Path
 from PyQt5 import uic, QtCore
-from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
+from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import Qt
 
 from fyler import utils, settings, settings_handler
@@ -9,8 +10,9 @@ from fyler.utils import listwidget_text_items, listwidget_data_items, listwidget
 from fyler.views.search_window import SearchWindow
 from fyler.views.settings_window import SettingsWindow
 from fyler.views.advanced_window import AdvancedWindow
+from fyler import assets
 
-uifile = (Path(__file__) / '../../assets/ui/mainwindow.ui').resolve()
+uifile = resources.open_text(assets, 'mainwindow.ui')
 MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
 
 

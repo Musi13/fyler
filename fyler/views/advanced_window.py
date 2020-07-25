@@ -1,8 +1,9 @@
+from importlib import resources
 from pathlib import Path
 from PyQt5 import uic
-from fyler import providers
+from fyler import providers, assets
 
-uifile = (Path(__file__) / '../../assets/ui/advancedwindow.ui').resolve()
+uifile = resources.open_text(assets, 'advancedwindow.ui')
 AdvancedWindowUI, AdvancedWindowBase = uic.loadUiType(uifile)
 
 

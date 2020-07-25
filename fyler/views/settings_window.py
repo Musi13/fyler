@@ -1,12 +1,13 @@
 import os
+from importlib import resources
 from pathlib import Path
 from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
 from PyQt5.QtCore import Qt
 
-from fyler import utils, settings, settings_handler, providers
+from fyler import utils, settings, settings_handler, providers, assets
 
-uifile = (Path(__file__) / '../../assets/ui/settingswindow.ui').resolve()
+uifile = resources.open_text(assets, 'settingswindow.ui')
 SettingsWindowUI, SettingsWindowBase = uic.loadUiType(uifile)
 
 class SettingsWindow(SettingsWindowUI, SettingsWindowBase):

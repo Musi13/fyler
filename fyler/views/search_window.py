@@ -1,12 +1,13 @@
 import os
+from importlib import resources
 from pathlib import Path
 from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QLabel, QMainWindow, QFileDialog, QInputDialog
 from PyQt5.QtCore import Qt
 
-from fyler import utils, settings
+from fyler import utils, settings, assets
 
-uifile = (Path(__file__) / '../../assets/ui/searchwindow.ui').resolve()
+uifile = resources.open_text(assets, 'searchwindow.ui')
 SearchWindowUI, SearchWindowBase = uic.loadUiType(uifile)
 
 class SearchWindow(SearchWindowUI, SearchWindowBase):
