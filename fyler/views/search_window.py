@@ -36,6 +36,9 @@ class SearchWindow(SearchWindowUI, SearchWindowBase):
         results = settings.provider().search(self.searchBox.text())
 
         for item in results:
-            text = settings['search_result_format'].format(**item.template_values())
+            try:
+                text = settings['search_result_format'].format(**item.template_values())
+            except KeyError as e:
+                text = f"*Error: Template variable {e} not found*"
             qtitem = utils.listwidget_item(text, item)
             self.resultList.addItem(qtitem)

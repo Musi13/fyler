@@ -1,8 +1,10 @@
 import logging
 import re
 import os
+import traceback
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5.QtGui import QPaintDevice
+from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
 
 logger = logging.getLogger(__name__)
 
@@ -54,3 +56,20 @@ def relative_symlink(source, dest):
     """Like symlink, but the link is relative (for portability)"""
     relsource = os.path.relpath(source, os.path.dirname(dest))
     return os.symlink(relsource, dest)
+
+
+def popup_excepthook(etype, value, tb):
+    """For unexpected errors, popup a window with an error message"""
+    traceback.print_exception(etype, value, tb)
+    while tb is not None:
+        parent = tb.tb_frame.f_locals.get('self')
+        if isinstance(parent, QPaintDevice):
+            break
+        tb = tb.tb_next
+    else:
+        logger.warning('Could not find parent to report exception')
+        return
+    message = QMessageBox(parent)
+    message.setWindowTitle('Error')
+    message.setText(str(value))
+    message.open()
