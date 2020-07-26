@@ -53,7 +53,7 @@ class AniDBProvider(Provider):
         anime = soup.find('anime')
 
         anime_kwargs = {
-            'database': 'AniDB',
+            'database': self.name,
             'id': media.id,
             'date': date.fromisoformat(anime.find('startdate').text),
         }

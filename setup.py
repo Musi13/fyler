@@ -10,13 +10,13 @@ REQUIRED = [
     # AniDB
     'fuzzywuzzy[speedup]',
     'ratelimit',
-    'diskcache',
     'beautifulsoup4',
     'lxml',
 
     # General
     'requests',
     'appdirs',
+    'diskcache',
 ]
 
 setup(
@@ -33,6 +33,7 @@ setup(
         'fyler.providers': [
             'anidb = fyler.providers.anidb:AniDBProvider',
             'anilist = fyler.providers.anilist:AniListProvider',
+            'thetvdb = fyler.providers.thetvdb:TheTVDBProvider',
         ]
     },
     install_requires=REQUIRED

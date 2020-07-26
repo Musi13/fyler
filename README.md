@@ -1,5 +1,5 @@
 # Fyler
- An Open-Source bulk renaming desktop app. Select a number of files, then match them to media by searching with a provider (currently AniDB is the only really supported provider). Files can be renamed/symlinked/hardlinked based on a number of template variables: title, episode number, season number, etc.
+ An Open-Source bulk renaming desktop app. Select a number of files, then match them to media by searching with a provider (currently AniDB/TheTVDB). Files can be renamed/symlinked/hardlinked based on a number of template variables: title, episode number, season number, etc.
 
 This project was heavily inspired by Filebot and attempts to have a similar interface with similar template variables. That said, this project does not intend to replicate all features of Filebot, only the renaming of files. Even then, there's some differences: for example, Fyler currently doesn't perform any introspection of the media being renamed, so certain template variables are completely unavailable.
 
@@ -25,3 +25,10 @@ Alternatively, you can install `fyler` from PyPI. Note that fyler requires Pytho
 And here's some screenshots for Linux and OSX:
 ![linux](https://i.imgur.com/E0eNzOp.png)
 ![osx](https://i.imgur.com/Ll1EtPY.png)
+
+
+Attributions:
+
+The project is not affiliated with any of the metadata providers. More specifically,
+
+TheTVDB: Per api docs, "[some] TV information and images are provided by [TheTVDB.com](https://thetvdb.com), but we are not endorsed or certified by [TheTVDB.com](https://thetvdb.com) or its affiliates."

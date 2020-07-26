@@ -41,7 +41,7 @@ class SettingsDict(UserDict):
 
 def default_settings():
     return SettingsDict({
-        'provider': 'anidb',
+        'provider': 'thetvdb',
         'modify_action': 'rename',
         'output_format': '{n} - {s00e00} - {t}',
         'search_result_format': '{t}',
