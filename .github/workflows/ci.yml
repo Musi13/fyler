@@ -1,0 +1,40 @@
+# This workflow will build a pyinstaller single-file version of fyler
+# for each supported platform (ubuntu/macos/windows)
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        os: [ubuntu, macos, windows]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install . pyinstaller
+
+    - name: Build frozen app
+      run: |
+        pyinstaller --clean -y --dist ./dist/${{ matrix.os }} pyinstaller.spec
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: fyler-${{ matrix.os }}
+        path: dist/${{ matrix.os }}/*
