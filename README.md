@@ -20,3 +20,8 @@ These are all of the variables currently supported:
 
 To use this, download the executable for your platform from the releases tab.
 Alternatively, you can install `fyler` from PyPI. Note that fyler requires Python3.8.
+
+
+And here's some screenshots for Linux and OSX:
+![linux](https://i.imgur.com/E0eNzOp.png)
+![osx](https://i.imgur.com/Ll1EtPY.png)
