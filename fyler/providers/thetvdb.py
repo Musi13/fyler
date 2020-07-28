@@ -38,7 +38,6 @@ class TheTVDBProvider(Provider):
         )
         response.raise_for_status()
         parsed = response.json()['data']
-        print(parsed)
         series = Series(
             database=self.name,
             id=media.id,
@@ -59,7 +58,6 @@ class TheTVDBProvider(Provider):
             response.raise_for_status()
 
             for episode in response.json()['data']:
-                print(episode)
                 episodes.append(Episode(
                     database=self.name,
                     id=episode['id'],

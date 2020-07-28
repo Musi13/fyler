@@ -21,7 +21,7 @@ REQUIRED = [
 
 setup(
     name='fyler',
-    version='0+unknown',
+    version='0.1.0',
     description=DESCRIPTION,
     long_description=DESCRIPTION,
     author='Alex Gonzales<musigonzales@gmail.com>',
