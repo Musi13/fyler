@@ -14,4 +14,4 @@ class AdvancedWindow(AdvancedWindowUI, AdvancedWindowBase):
         self.anidbDownloadButton.clicked.connect(self.download_anidb_data)
 
     def download_anidb_data(self):
-        providers.all_providers['anidb'].download_title_data()
+        providers.all_providers()['anidb'].download_title_data()

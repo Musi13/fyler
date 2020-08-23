@@ -6,12 +6,12 @@ import requests
 from appdirs import AppDirs
 from diskcache import Cache
 
+from fyler import settings
 from fyler.models import Media, Series, Episode
 from .provider import Provider
 
 # Redefine dirs since importing settings causes a circular import
-dirs = AppDirs('fyler', 'fyler')
-_cache_dir = Path(dirs.user_cache_dir) / 'thetvdb'
+_cache_dir = Path(settings.appdirs.user_cache_dir) / 'thetvdb'
 _cache_dir.mkdir(parents=True, exist_ok=True)
 cache = Cache(directory=str(_cache_dir))
 

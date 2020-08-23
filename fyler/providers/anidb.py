@@ -12,13 +12,12 @@ from diskcache import Cache
 from fuzzywuzzy import process
 from ratelimit import limits, sleep_and_retry
 
-from fyler.models import Media, Series, Episode, Movie
+from fyler import settings
+from fyler.models import Media, Series, Episode, Special, Movie
 from .provider import Provider
 
-# Redefine dirs since importing settings causes a circular import
-dirs = AppDirs('fyler', 'fyler')
-_cache_dir = Path(dirs.user_cache_dir) / 'anidb'
-_titles_dat = Path(dirs.user_cache_dir) / 'anidb/data/anime-titles.dat'
+_cache_dir = Path(settings.appdirs.user_cache_dir) / 'anidb'
+_titles_dat = Path(settings.appdirs.user_cache_dir) / 'anidb/data/anime-titles.dat'
 _cache_dir.mkdir(parents=True, exist_ok=True)
 cache = Cache(directory=str(_cache_dir))
 
@@ -67,21 +66,30 @@ class AniDBProvider(Provider):
             for episode in anime.find('episodes').children:
                 if not isinstance(episode, bs4.element.Tag):
                     continue
-                if episode.find('epno').attrs['type'] != '1':
+                valid_types = ['1', '2'] if settings['include_specials'] else ['1']
+                etype = episode.find('epno').attrs['type']
+                if etype not in valid_types:
                     continue
+                eclass = {
+                    '1': Episode,
+                    '2': Special,
+                }[etype]
+                epno = episode.find('epno').text
                 episode_kwargs = {
                     'database': 'AniDB',
                     'series': None,  # Will be set later
                     'id': int(episode.attrs['id']),
                     'date': date.fromisoformat(episode.find('airdate').text),
                     'season_number': 0,  # Anime doesn't really do seasons normally...
-                    'episode_number': int(episode.find('epno').text),  # I want this to be an int, but sometimes its different (specials?)
+                    'episode_number': int(epno) if etype == '1' else 2**32,  # Some episodes aren't ints, e.g. specials
                 }
+                if etype == '2':
+                    episode_kwargs['str_episode_number'] = epno
                 for title in episode.find_all('title'):
                     if title.attrs['xml:lang'] == 'en':
                         episode_kwargs['title'] = title.text
                         break
-                episodes.append(Episode(**episode_kwargs))
+                episodes.append(eclass(**episode_kwargs))
             episodes.sort(key=lambda x: x.episode_number)
             anime_kwargs['episodes'] = episodes
 

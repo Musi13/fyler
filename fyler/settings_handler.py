@@ -33,7 +33,7 @@ class SettingsDict(UserDict):
     appdirs = dirs
 
     def provider(self):
-        return all_providers[self['provider']]
+        return all_providers()[self['provider']]
 
     def action(self):
         return _action_funcs[self['modify_action']]
@@ -45,6 +45,7 @@ def default_settings():
         'modify_action': 'rename',
         'output_format': '{n} - {s00e00} - {t}',
         'search_result_format': '{t}',
+        'include_specials': False,
     })
 
 

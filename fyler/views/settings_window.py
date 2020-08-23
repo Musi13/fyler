@@ -17,7 +17,7 @@ class SettingsWindow(SettingsWindowUI, SettingsWindowBase):
 
     def load_settings(self):
         current = 0
-        for idx, (key, value) in enumerate(providers.all_providers.items()):
+        for idx, (key, value) in enumerate(providers.all_providers().items()):
             self.providerBox.addItem(value.name, key)
             if key == settings['provider']:
                 current = idx

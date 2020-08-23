@@ -25,7 +25,7 @@ with open(Path(__file__).parent / 'README.md') as f:
 
 setup(
     name='fyler',
-    version='0.1.1',
+    version='0.1.2',
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type='text/markdown',

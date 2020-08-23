@@ -47,14 +47,26 @@ class Episode(Media):
     season_number: int
 
     def template_values(self) -> dict:
-        return dict(**super().template_values(), **{
+        return {**super().template_values(), **{
             'n': self.series.title,
             's': self.season_number,
             'e': self.episode_number,
             'sxe': f'{self.season_number}x{self.episode_number:02}',
             's00e00': f'S{self.season_number:02}E{self.episode_number:02}' if self.season_number and self.episode_number else '*',
             'e00': f'{self.episode_number:02}',
-        })
+        }}
+
+
+@dataclass
+class Special(Episode):
+    str_episode_number: str
+
+    def template_values(self) -> dict:
+        return {**super().template_values(), **{
+            'sxe': f'{self.season_number}x{self.str_episode_number}',
+            's00e00': f'S{self.season_number:02}E{self.str_episode_number}' if self.season_number and self.str_episode_number else '*',
+            'e00': self.str_episode_number,
+        }}
 
 
 @dataclass
