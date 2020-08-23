@@ -105,11 +105,13 @@ class MainWindow(MainWindowUI, MainWindowBase):
         for i in range(self.destList.count()):
             qtitem = self.destList.item(i)
             item = qtitem.data(Qt.UserRole)
-            # TODO: Formats can fail because of invalid types (sometimes things are None),
-            # it would be nice if those cases resulted in a * or something without explicitly
-            # handling it in every template_values()
             env = item.template_values()
             for key, value in env.items():
+                if callable(value):
+                    try:  # Support lambda: <risky>; if <risky> fails, replace with *
+                        value = value()
+                    except Exception:
+                        value = '*'
                 env[key] = str(value).translate(chartab)
             try:
                 dest = settings['output_format'].format(**env)

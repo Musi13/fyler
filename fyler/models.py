@@ -52,7 +52,7 @@ class Episode(Media):
             's': self.season_number,
             'e': self.episode_number,
             'sxe': f'{self.season_number}x{self.episode_number:02}',
-            's00e00': f'S{self.season_number:02}E{self.episode_number:02}' if self.season_number and self.episode_number else '*',
+            's00e00': lambda: f'S{self.season_number:02}E{self.episode_number:02}',
             'e00': f'{self.episode_number:02}',
         }}
 
@@ -64,7 +64,7 @@ class Special(Episode):
     def template_values(self) -> dict:
         return {**super().template_values(), **{
             'sxe': f'{self.season_number}x{self.str_episode_number}',
-            's00e00': f'S{self.season_number:02}E{self.str_episode_number}' if self.season_number and self.str_episode_number else '*',
+            's00e00': lambda: f'S{self.season_number:02}E{self.str_episode_number}',
             'e00': self.str_episode_number,
         }}
 

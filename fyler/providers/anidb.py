@@ -80,7 +80,7 @@ class AniDBProvider(Provider):
                     'series': None,  # Will be set later
                     'id': int(episode.attrs['id']),
                     'date': date.fromisoformat(episode.find('airdate').text),
-                    'season_number': 0,  # Anime doesn't really do seasons normally...
+                    'season_number': None,  # Anime doesn't really do seasons normally...
                     'episode_number': int(epno) if etype == '1' else 2**32,  # Some episodes aren't ints, e.g. specials
                 }
                 if etype == '2':
