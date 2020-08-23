@@ -16,13 +16,15 @@ uifile = resources.open_text(assets, 'mainwindow.ui')
 MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
 
 
-def choose_sources_dialog(parent, title, directory=True):
+def choose_sources_dialog(parent, title, directory=True, initial=None):
     options = QFileDialog.Options()
     if directory:
         options |= QFileDialog.ShowDirsOnly
     dialog = QFileDialog(parent, title, os.path.expanduser('~'), options=options)
     dialog.setFileMode(QFileDialog.Directory if directory else QFileDialog.ExistingFiles)
     dialog.setParent(parent, QtCore.Qt.Sheet)
+    if initial:
+        dialog.setDirectory(initial)
     return dialog
 
 
@@ -64,6 +66,8 @@ class MainWindow(MainWindowUI, MainWindowBase):
         def receive():
             self.sourceList.clear()
             self.destList.clear()
+            settings['prev_sources_directory'] = dialog.directory().absolutePath()
+            settings.save()
             sources = dialog.selectedFiles()
             for item in sources:
                 if os.path.isdir(item):
@@ -80,7 +84,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
 
         t = 'directory' if directory else 'files'
         msg = self.tr(f"Choose {t} to rename")
-        dialog = choose_sources_dialog(self, msg, directory=directory)
+        dialog = choose_sources_dialog(self, msg, directory=directory, initial=settings.get('prev_sources_directory'))
         dialog.open(receive)
 
     def _update_dest_paths(self):

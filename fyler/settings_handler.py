@@ -38,6 +38,10 @@ class SettingsDict(UserDict):
     def action(self):
         return _action_funcs[self['modify_action']]
 
+    def save(self):
+        """ Shortcut to save_settings() """
+        save_settings()
+
 
 def default_settings():
     return SettingsDict({
