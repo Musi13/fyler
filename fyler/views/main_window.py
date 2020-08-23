@@ -47,6 +47,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
         self.filesButton.clicked.connect(lambda: self.add_sources(directory=False))
 
         self.matchButton.clicked.connect(self.match_sources)
+        self.matchButton.setText(f'Match ({settings.provider().name})')
         self.actionButton.clicked.connect(self.process_action)
         self.actionButton.setText(settings_handler.action_names[settings['modify_action']])
 
@@ -153,6 +154,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
         window.setParent(self, Qt.Sheet)
         window.show()
         window.exec_()
+        self.matchButton.setText(f'Match ({settings.provider().name})')
         self.actionButton.setText(settings_handler.action_names[settings['modify_action']])
         self._update_dest_paths()
 
