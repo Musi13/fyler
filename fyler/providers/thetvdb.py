@@ -46,10 +46,9 @@ class TheTVDBProvider(Provider):
             episodes=None
         )
 
-        last = 0
         page = 1
         episodes = []
-        while not last:
+        while page:
             response = requests.get(
                 f'{API_ROOT}/series/{media.id}/episodes',
                 params={'page': page},
@@ -64,11 +63,10 @@ class TheTVDBProvider(Provider):
                     title=episode['episodeName'],
                     season_number=episode['airedSeason'],
                     episode_number=episode['airedEpisodeNumber'],
-                    date=date.fromisoformat(episode['firstAired']),  # TODO
+                    date=date.fromisoformat(episode['firstAired']) if episode['firstAired'] else None,  # TODO
                     series=series,
                 ))
 
-            last = response.json()['links']['last']
             page = response.json()['links']['next']
 
         series.episodes = episodes
