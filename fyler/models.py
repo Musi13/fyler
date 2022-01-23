@@ -54,7 +54,7 @@ class Episode(Media):
             'sxe': f'{self.season_number}x{self.episode_number:02}',
             's00e00': lambda: f'S{self.season_number:02}E{self.episode_number:02}',
             's00': lambda: f'{self.season_number:02}',
-            'e00': f'{self.episode_number:02}',
+            'e00': lambda: f'{self.episode_number:02}',
         }}
 
 

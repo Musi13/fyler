@@ -61,7 +61,7 @@ class AniDBProvider(Provider):
                 anime_kwargs['title'] = title.text
                 break
 
-        if anime.find('type').text == 'TV Series':
+        if anime.find('type').text in ['TV Series', 'TV Special']:
             episodes = []
             for episode in anime.find('episodes').children:
                 if not isinstance(episode, bs4.element.Tag):
@@ -79,7 +79,7 @@ class AniDBProvider(Provider):
                     'database': 'AniDB',
                     'series': None,  # Will be set later
                     'id': int(episode.attrs['id']),
-                    'date': date.fromisoformat(episode.find('airdate').text),
+                    'date': date.fromisoformat(episode.find('airdate').text) if episode.find('airdate') else None,
                     'season_number': None,  # Anime doesn't really do seasons normally...
                     'episode_number': int(epno) if etype == '1' else 2**32,  # Some episodes aren't ints, e.g. specials
                 }

@@ -29,9 +29,11 @@ def choose_sources_dialog(parent, title, directory=True, initial=None):
 
 
 class MainWindow(MainWindowUI, MainWindowBase):
-    def __init__(self, parent=None):
+    def __init__(self, application=None):
         super().__init__()
         self.setupUi(self)
+
+        self.application = application
 
         # Scroll lists together
         self.sourceList.verticalScrollBar().valueChanged.connect(
@@ -64,8 +66,11 @@ class MainWindow(MainWindowUI, MainWindowBase):
 
     def add_sources(self, directory: bool):
         """Open file selection dialog and load choices into sourceList"""
+        append = self.application.queryKeyboardModifiers() & Qt.ControlModifier
+
         def receive():
-            self.sourceList.clear()
+            if not append:
+                self.sourceList.clear()
             self.destList.clear()
             settings['prev_sources_directory'] = dialog.directory().absolutePath()
             settings.save()
@@ -84,7 +89,7 @@ class MainWindow(MainWindowUI, MainWindowBase):
             self.sourceList.sortItems()
 
         t = 'directory' if directory else 'files'
-        msg = self.tr(f"Choose {t} to rename")
+        msg = self.tr(f"Choose {t} to rename" + ' (append)' if append else '')
         dialog = choose_sources_dialog(self, msg, directory=directory, initial=settings.get('prev_sources_directory'))
         dialog.open(receive)
 
