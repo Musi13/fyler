@@ -6,7 +6,7 @@ from pathlib import Path
 DESCRIPTION = 'An application to help organize TV Shows/Anime/Movies'
 REQUIRED = [
     # UI
-    'PyQT5',
+    'PyQt5',
 
     # AniDB
     'fuzzywuzzy[speedup]',
