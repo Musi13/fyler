@@ -4,7 +4,7 @@ from importlib import resources
 
 from PyQt5 import uic, QtCore
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QListView, QAbstractItemView, QTreeView
 
 from fyler import assets, utils, settings, settings_handler
 from fyler.utils import listwidget_text_items, listwidget_data_items, listwidget_item
@@ -19,10 +19,19 @@ MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
 def choose_sources_dialog(parent, title, directory=True, initial=None):
     options = QFileDialog.Options()
     if directory:
-        options |= QFileDialog.ShowDirsOnly
+        options |= QFileDialog.ShowDirsOnly | QFileDialog.DontUseNativeDialog
     dialog = QFileDialog(parent, title, os.path.expanduser('~'), options=options)
     dialog.setFileMode(QFileDialog.Directory if directory else QFileDialog.ExistingFiles)
     dialog.setParent(parent, QtCore.Qt.Sheet)
+
+    file_view = dialog.findChild(QListView, 'listView')
+    if file_view:
+        file_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
+
+    tree_view = dialog.findChild(QTreeView)
+    if tree_view:
+        tree_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
+
     if initial:
         dialog.setDirectory(initial)
     return dialog
@@ -91,7 +100,8 @@ class MainWindow(MainWindowUI, MainWindowBase):
         t = 'directory' if directory else 'files'
         msg = self.tr(f"Choose {t} to rename" + ' (append)' if append else '')
         dialog = choose_sources_dialog(self, msg, directory=directory, initial=settings.get('prev_sources_directory'))
-        dialog.open(receive)
+        dialog.accepted.connect(receive)  # Explicit connect accepted since open() doesnt work with multi-select
+        dialog.open()
 
     def _update_dest_paths(self):
         """Update the paths based on format and episode data"""
