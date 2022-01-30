@@ -1,5 +1,6 @@
 import os
 import platform
+from fnmatch import fnmatch
 from importlib import resources
 
 from PyQt5 import uic, QtCore
@@ -89,10 +90,28 @@ class MainWindow(MainWindowUI, MainWindowBase):
                     for subdir, dirs, files in os.walk(item):
                         for filename in files:
                             filepath = os.path.abspath(os.path.join(subdir, filename))
+
+                            skip = False
+                            for pattern in settings['exclude_filters']:
+                                if fnmatch(filepath, pattern):
+                                    skip = True
+                                    break
+                            if skip:
+                                continue
+
                             qtitem = listwidget_item(filename, filepath)
                             self.sourceList.addItem(qtitem)
                 else:
                     filepath = os.path.abspath(item)
+
+                    skip = True
+                    for pattern in settings['exclude_filters']:
+                        if fnmatch(filepath, pattern):
+                            skip = True
+                            break
+                    if skip:
+                        continue
+
                     qtitem = listwidget_item(os.path.basename(filepath), filepath)
                     self.sourceList.addItem(qtitem)
             self.sourceList.sortItems()

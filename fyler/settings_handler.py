@@ -50,6 +50,7 @@ def default_settings():
         'output_format': '{n} - {s00e00} - {t}',
         'search_result_format': '{t}',
         'include_specials': False,
+        'exclude_filters': [],
     })
 
 

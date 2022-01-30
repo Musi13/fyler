@@ -25,13 +25,6 @@
    <layout class="QVBoxLayout" name="mainLayout">
     <item>
      <layout class="QGridLayout" name="editLayout">
-      <item row="2" column="0">
-       <widget class="QLabel" name="formatLabel">
-        <property name="text">
-         <string>Format</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QComboBox" name="providerBox"/>
       </item>
@@ -48,13 +41,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="providerLabel">
-        <property name="text">
-         <string>Provider</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="0">
        <widget class="QLabel" name="searchLabel">
         <property name="text">
@@ -62,8 +48,32 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="providerLabel">
+        <property name="text">
+         <string>Provider</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="formatLabel">
+        <property name="text">
+         <string>Format</string>
+        </property>
+       </widget>
+      </item>
       <item row="3" column="1">
        <widget class="QLineEdit" name="searchEdit"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="excludeLabel">
+        <property name="text">
+         <string>Exclude Filter</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="excludeEdit"/>
       </item>
      </layout>
     </item>

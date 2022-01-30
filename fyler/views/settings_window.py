@@ -32,6 +32,7 @@ class SettingsWindow(SettingsWindowUI, SettingsWindowBase):
 
         self.formatEdit.setText(settings['output_format'])
         self.searchEdit.setText(settings['search_result_format'])
+        self.excludeEdit.setText(', '.join(settings['exclude_filters']))
 
     def save_settings(self):
         newsettings = {
@@ -39,6 +40,7 @@ class SettingsWindow(SettingsWindowUI, SettingsWindowBase):
             'modify_action': self.actionBox.currentData(),
             'output_format': self.formatEdit.text(),
             'search_result_format': self.searchEdit.text(),
+            'exclude_filters': [k.strip() for k in self.excludeEdit.text().split(',')],
         }
         settings.update(newsettings)
         settings_handler.save_settings()
